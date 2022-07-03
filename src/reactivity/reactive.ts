@@ -1,27 +1,22 @@
-
 /*
-* @Date: 2022-06-29 20:50:44
-* @Author: 枫
+ * @Date: 2022-06-29 20:50:44
+ * @Author: 枫
  * @LastEditors: 枫
-* @description: description
- * @LastEditTime: 2022-06-29 21:15:14
+ * @description: description
+ * @LastEditTime: 2022-07-03 23:13:48
 */
+
+import { mutableHandlers, readonlyHandlers } from './baseHandlers';
 import { track, trigger } from "./effect";
 
-export function reactive(raw: Record<any, any>) {
-  return new Proxy(raw, {
-    get(target, key) {
-      const res = Reflect.get(target, key);
-      // 收集依赖
-      track(target, key)
-      return res;
-    },
-    set(target, key, value) {
-      const res = Reflect.set(target, key, value);
+export function reactive<T extends object>(raw: T): T {
+  return createActiveObject<T>(raw, mutableHandlers)
+}
 
-      // TODO 收集依赖
-      trigger(target, key)
-      return res
-    }
-  })
+export function readonly<T extends object>(raw: T): Readonly<T> {
+  return createActiveObject<Readonly<T>>(raw, readonlyHandlers)
+}
+
+function createActiveObject<T extends object>(raw: T, baseHandlers: any): T {
+  return new Proxy(raw, baseHandlers);
 }
