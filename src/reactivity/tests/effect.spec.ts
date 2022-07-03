@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-03 14:45:11
+ * @LastEditTime: 2022-07-03 16:24:29
  */
 import { reactive } from '../reactive';
 import { effect, stop } from '../effect';
@@ -72,12 +72,22 @@ describe('effect', () => {
     
     expect(dummy).toBe(2);
     stop(runner);
-    // obj.prop = 3
-    obj.prop++;
+    obj.prop = 3
+    // obj.prop++;
     expect(dummy).toBe(2);
 
     // stopped effect should still be manually callable
     runner();
     expect(dummy).toBe(3);
+  });
+
+  it("events: onStop", () => {
+    const onStop = jest.fn();
+    const runner = effect(() => {}, {
+      onStop,
+    });
+
+    stop(runner);
+    expect(onStop).toHaveBeenCalled();
   });
 })

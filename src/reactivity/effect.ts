@@ -1,13 +1,18 @@
+import { extend } from "../shared"
+
 /*
  * @Date: 2022-06-29 20:56:16
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-03 15:14:30
+ * @LastEditTime: 2022-07-03 16:58:53
  */
 class ReactiveEffect {
   private _fn: Function
   public scheduler?: Function
+  deps: Set<ReactiveEffect>[] = []
+  active = true
+  onStop?: () => void
 
   constructor(fn: Function, scheduler?: Function) {
     this._fn = fn
@@ -18,6 +23,24 @@ class ReactiveEffect {
     activeEffect = this
     return this._fn()
   }
+
+  stop() {
+    if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
+      this.active = false
+    }
+  }
+}
+
+
+// 清除依赖 
+function cleanupEffect(effect: ReactiveEffect) {
+  effect.deps.forEach(dep => {
+    dep.delete(effect)
+  })
 }
 
 let activeEffect: ReactiveEffect;
@@ -25,11 +48,19 @@ let activeEffect: ReactiveEffect;
 export function effect(fn: Function, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler)
 
-  _effect.run()
-  
+  extend(_effect, options)
 
-  const runner = _effect.run.bind(_effect)
+  _effect.run()
+
+  const runner: any = _effect.run.bind(_effect)
+  runner.effect = _effect
+
   return runner
+}
+
+
+export function stop(runner: any) {
+  runner.effect.stop()
 }
 
 
@@ -49,8 +80,12 @@ export function track<T extends object>(target: T, key: keyof T) {
     depsMap.set(key, dep = new Set<ReactiveEffect>())
   }
 
-  dep.add(activeEffect)
+  if (!activeEffect) return;
 
+  // 收集依赖
+  dep.add(activeEffect)
+  // 反向收集依赖
+  activeEffect.deps.push(dep)
 }
 
 export function trigger<T extends object>(target: T, key: keyof T) {
