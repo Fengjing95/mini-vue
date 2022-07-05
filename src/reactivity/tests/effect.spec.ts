@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-03 16:24:29
+ * @LastEditTime: 2022-07-05 17:02:47
  */
 import { reactive } from '../reactive';
 import { effect, stop } from '../effect';
@@ -72,8 +72,8 @@ describe('effect', () => {
     
     expect(dummy).toBe(2);
     stop(runner);
-    obj.prop = 3
-    // obj.prop++;
+    // obj.prop = 3
+    obj.prop++;
     expect(dummy).toBe(2);
 
     // stopped effect should still be manually callable

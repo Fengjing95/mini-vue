@@ -1,12 +1,15 @@
+/*
+* @Date: 2022-06-29 20:56:16
+* @Author: 枫
+ * @LastEditors: 枫
+* @description: description
+ * @LastEditTime: 2022-07-05 17:48:56
+*/
 import { extend } from "../shared"
 
-/*
- * @Date: 2022-06-29 20:56:16
- * @Author: 枫
- * @LastEditors: 枫
- * @description: description
- * @LastEditTime: 2022-07-03 16:58:53
- */
+let activeEffect: ReactiveEffect;
+let shouldTrack: boolean;
+
 class ReactiveEffect {
   private _fn: Function
   public scheduler?: Function
@@ -20,8 +23,17 @@ class ReactiveEffect {
   }
 
   run() {
+    if (!this.active)
+      // 如果被 stop 直接执行返回
+      return this._fn()
+
+    // 否则进行依赖收集
+    shouldTrack = true
     activeEffect = this
-    return this._fn()
+    const result = this._fn()
+    shouldTrack = false // 依赖收集结束之后将状态重置
+
+    return result
   }
 
   stop() {
@@ -41,9 +53,10 @@ function cleanupEffect(effect: ReactiveEffect) {
   effect.deps.forEach(dep => {
     dep.delete(effect)
   })
+  // 上面清理之后的 deps 内容是空 set, 已经没有用了, 可以直接清空
+  effect.deps.length = 0
 }
 
-let activeEffect: ReactiveEffect;
 
 export function effect(fn: Function, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler)
@@ -67,8 +80,8 @@ export function stop(runner: any) {
 const targetMap = new WeakMap<object, Map<keyof any, Set<ReactiveEffect>>>()
 
 export function track<T extends object>(target: T, key: keyof T) {
+  if(!isTracking()) return
   // target -> key -> dep
-
   let depsMap = targetMap.get(target)
 
   if (!depsMap) {
@@ -80,12 +93,22 @@ export function track<T extends object>(target: T, key: keyof T) {
     depsMap.set(key, dep = new Set<ReactiveEffect>())
   }
 
-  if (!activeEffect) return;
-
+  if (dep.has(activeEffect))
+    // 如果已经被收集, 中断
+    return
   // 收集依赖
   dep.add(activeEffect)
   // 反向收集依赖
   activeEffect.deps.push(dep)
+}
+
+function isTracking() {
+  // // 如果没有激活的 effect 中断执行
+  // if (!activeEffect) return;
+  // // 如果不应该收集依赖, 中断执行
+  // if (!shouldTrack) return
+
+  return shouldTrack && activeEffect !== undefined
 }
 
 export function trigger<T extends object>(target: T, key: keyof T) {
