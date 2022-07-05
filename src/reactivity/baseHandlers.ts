@@ -3,14 +3,20 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-03 23:23:12
+ * @LastEditTime: 2022-07-05 16:43:18
  */
 import { track, trigger } from "./effect";
+import { ReactiveFlags } from "./reactive";
 
 
 // 返回 getter
 function createGetter(isReadOnly: boolean = false) {
   return function get(target: Record<any, any>, key: string | symbol) {
+    if (key === ReactiveFlags.IS_REACTIVE)
+      return !isReadOnly
+    else if (key === ReactiveFlags.IS_READONLY)
+      return isReadOnly
+
     const res = Reflect.get(target, key);
     // 如果不是 readonly 收集依赖
     if (!isReadOnly)
