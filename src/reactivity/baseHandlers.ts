@@ -3,23 +3,30 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-05 16:43:18
+ * @LastEditTime: 2022-07-10 13:03:06
  */
+import { isObject } from "../shared";
 import { track, trigger } from "./effect";
-import { ReactiveFlags } from "./reactive";
+import { reactive, ReactiveFlags, readonly } from "./reactive";
 
 
 // 返回 getter
-function createGetter(isReadOnly: boolean = false) {
+function createGetter(isReadonly: boolean = false) {
   return function get(target: Record<any, any>, key: string | symbol) {
     if (key === ReactiveFlags.IS_REACTIVE)
-      return !isReadOnly
+      return !isReadonly
     else if (key === ReactiveFlags.IS_READONLY)
-      return isReadOnly
+      return isReadonly
 
     const res = Reflect.get(target, key);
+
+    if (isObject(res)) {
+      // 如果是对象类型, 递归代理, 根据类型不同调用不同得到方法
+      return isReadonly ? readonly(res) : reactive(res)
+    }
+
     // 如果不是 readonly 收集依赖
-    if (!isReadOnly)
+    if (!isReadonly)
       track(target, key);
     return res;
   }
