@@ -1,9 +1,10 @@
+import { extend } from './../shared/index';
 /*
  * @Date: 2022-07-03 22:48:13
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-10 13:03:06
+ * @LastEditTime: 2022-07-10 13:18:05
  */
 import { isObject } from "../shared";
 import { track, trigger } from "./effect";
@@ -11,7 +12,7 @@ import { reactive, ReactiveFlags, readonly } from "./reactive";
 
 
 // 返回 getter
-function createGetter(isReadonly: boolean = false) {
+function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Record<any, any>, key: string | symbol) {
     if (key === ReactiveFlags.IS_REACTIVE)
       return !isReadonly
@@ -19,6 +20,11 @@ function createGetter(isReadonly: boolean = false) {
       return isReadonly
 
     const res = Reflect.get(target, key);
+
+    if (shallow) {
+      // 如果只是浅层代理直接返回
+      return res
+    }
 
     if (isObject(res)) {
       // 如果是对象类型, 递归代理, 根据类型不同调用不同得到方法
@@ -64,3 +70,9 @@ export const readonlyHandlers = {
     return true
   }
 }
+
+const shallowReadonlyGet = createGetter(true, true)
+
+export const shallowReadonlyHandlers = extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet
+})

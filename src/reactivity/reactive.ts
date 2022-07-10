@@ -3,10 +3,10 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-05 16:50:01
+ * @LastEditTime: 2022-07-10 13:18:19
 */
 
-import { mutableHandlers, readonlyHandlers } from './baseHandlers';
+import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from './baseHandlers';
 
 export function reactive<T extends object>(raw: T): T {
   return createActiveObject<T>(raw, mutableHandlers)
@@ -14,6 +14,10 @@ export function reactive<T extends object>(raw: T): T {
 
 export function readonly<T extends object>(raw: T): Readonly<T> {
   return createActiveObject<Readonly<T>>(raw, readonlyHandlers)
+}
+
+export function shallowReadonly<T extends object>(raw: T): Readonly<T> {
+  return createActiveObject<Readonly<T>>(raw, shallowReadonlyHandlers)
 }
 
 function createActiveObject<T extends object>(raw: T, baseHandlers: any): T {
