@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-10 13:18:19
+ * @LastEditTime: 2022-07-10 13:30:21
 */
 
 import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from './baseHandlers';
@@ -18,6 +18,10 @@ export function readonly<T extends object>(raw: T): Readonly<T> {
 
 export function shallowReadonly<T extends object>(raw: T): Readonly<T> {
   return createActiveObject<Readonly<T>>(raw, shallowReadonlyHandlers)
+}
+
+export function isProxy(value: unknown) {
+  return isReadonly(value) || isReactive(value);
 }
 
 function createActiveObject<T extends object>(raw: T, baseHandlers: any): T {

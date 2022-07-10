@@ -3,9 +3,9 @@
 * @Author: 枫
  * @LastEditors: 枫
 * @description: description
- * @LastEditTime: 2022-07-10 12:57:37
+ * @LastEditTime: 2022-07-10 13:31:38
 */
-import { isReadonly, readonly } from "../reactive";
+import { isProxy, isReadonly, readonly } from "../reactive";
 
 describe("happy path", () => {
   it("readonly", () => { 
@@ -15,7 +15,9 @@ describe("happy path", () => {
     expect(wrapped).not.toBe(original);
     expect(wrapped.foo).toBe(1);
     expect(isReadonly( wrapped )).toBe(true)
-    expect(isReadonly( original )).toBe(false)
+    expect(isReadonly(original)).toBe(false)
+    
+    expect(isProxy(wrapped)).toBe(true)
   })
   
   it("warn when set", () => {

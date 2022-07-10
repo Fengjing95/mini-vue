@@ -3,9 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-10 12:22:52
+ * @LastEditTime: 2022-07-10 13:31:06
  */
-import {isReactive, reactive} from '../reactive'
+import {isProxy, isReactive, reactive} from '../reactive'
 describe('reactive', () => {
   it('happy path', () => {
     const original = { foo: 1 };
@@ -14,6 +14,8 @@ describe('reactive', () => {
     expect(observed.foo).toBe(1);
     expect(isReactive(observed)).toBe(true)
     expect(isReactive(original)).toBe(false)
+
+    expect(isProxy(observed)).toBe(true)
   })
 
   it('nested reactive', () => {
