@@ -3,14 +3,14 @@
 * @Author: 枫
  * @LastEditors: 枫
 * @description: description
- * @LastEditTime: 2022-07-05 17:48:56
+ * @LastEditTime: 2022-07-18 21:43:46
 */
 import { extend } from "../shared"
 
 let activeEffect: ReactiveEffect;
 let shouldTrack: boolean;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: Function
   public scheduler?: Function
   deps: Set<ReactiveEffect>[] = []
@@ -80,7 +80,7 @@ export function stop(runner: any) {
 const targetMap = new WeakMap<object, Map<keyof any, Set<ReactiveEffect>>>()
 
 export function track<T extends object>(target: T, key: keyof T) {
-  if(!isTracking()) return
+  if (!isTracking()) return
   // target -> key -> dep
   let depsMap = targetMap.get(target)
 
@@ -93,6 +93,10 @@ export function track<T extends object>(target: T, key: keyof T) {
     depsMap.set(key, dep = new Set<ReactiveEffect>())
   }
 
+  trackEffects(dep)
+}
+
+export function trackEffects(dep: Set<ReactiveEffect>) {
   if (dep.has(activeEffect))
     // 如果已经被收集, 中断
     return
@@ -102,7 +106,7 @@ export function track<T extends object>(target: T, key: keyof T) {
   activeEffect.deps.push(dep)
 }
 
-function isTracking() {
+export function isTracking() {
   // // 如果没有激活的 effect 中断执行
   // if (!activeEffect) return;
   // // 如果不应该收集依赖, 中断执行
@@ -115,7 +119,11 @@ export function trigger<T extends object>(target: T, key: keyof T) {
   let depsMap = targetMap.get(target)
 
   let dep = depsMap!.get(key) as Set<ReactiveEffect>
+  
+  triggerEffects(dep)
+}
 
+export function triggerEffects(dep: Set<ReactiveEffect>) {
   for (const effect of dep) {
     if (effect.scheduler)
       effect.scheduler()
