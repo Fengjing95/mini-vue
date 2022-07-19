@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: ref
- * @LastEditTime: 2022-07-19 20:40:50
+ * @LastEditTime: 2022-07-19 21:11:00
  */
 
 import { hasChange, isObject } from "../shared";
@@ -43,7 +43,7 @@ function convert(value: any) {
   return isObject(value) ? reactive(value) : value;
 }
 
-// 手机 ref 依赖
+// 收集 ref 依赖
 function trackRefValue(ref: RefImpl) {
   if(isTracking())
       trackEffects(ref.dep)
@@ -60,5 +60,21 @@ export function isRef(value: any) {
 
 export function unRef(value: any) {
   return isRef(value) ? value._rawValue : value
+}
+
+export function proxyRefs<T extends object>(objectWithRef: T): T {
+  return new Proxy(objectWithRef, {
+    get(target, key) {
+      return unRef(Reflect.get(target, key))
+    },
+    set(target: Record<any, any>, key: string, newValue) {
+      if (isRef(target[key]) && !isRef(newValue)) {
+        // 如果原值是 ref 并且 newValue 不是 ref,  赋值给 .value,
+        return target[key].value = newValue;
+      }
+      // target[key] 是原始值,或者 newValue 是 ref 对象直接赋值
+      return Reflect.set(target, key, newValue)
+    }
+  })
 }
 
