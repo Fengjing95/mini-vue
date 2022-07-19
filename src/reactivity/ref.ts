@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: ref
- * @LastEditTime: 2022-07-18 22:13:22
+ * @LastEditTime: 2022-07-19 20:40:50
  */
 
 import { hasChange, isObject } from "../shared";
@@ -15,6 +15,7 @@ class RefImpl {
   private _value: any;
   private _rawValue: any;
   public dep: Set<ReactiveEffect>;
+  private __v_isRef = true;
 
   constructor(value: any) {
     this._rawValue = value;
@@ -51,5 +52,13 @@ function trackRefValue(ref: RefImpl) {
 
 export function ref(value: any) {
   return new RefImpl(value);
+}
+
+export function isRef(value: any) {
+  return !!value.__v_isRef
+}
+
+export function unRef(value: any) {
+  return isRef(value) ? value._rawValue : value
 }
 

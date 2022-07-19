@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-18 22:09:30
+ * @LastEditTime: 2022-07-19 20:39:11
  */
 import { effect } from "../effect";
 import { reactive } from "../reactive";
@@ -60,7 +60,7 @@ describe("ref", () => {
     expect(user.age.value).toBe(10);
   });
 
-  it.skip("isRef", () => {
+  it("isRef", () => {
     const a = ref(1);
     const user = reactive({
       age: 1,
@@ -70,7 +70,7 @@ describe("ref", () => {
     expect(isRef(user)).toBe(false);
   });
 
-  it.skip("unRef", () => {
+  it("unRef", () => {
     const a = ref(1);
     expect(unRef(a)).toBe(1);
     expect(unRef(1)).toBe(1);
