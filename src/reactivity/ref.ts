@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: ref
- * @LastEditTime: 2022-07-19 21:11:00
+ * @LastEditTime: 2022-07-27 21:46:59
  */
 
 import { hasChange, isObject } from "../shared";
@@ -11,9 +11,9 @@ import { isTracking, ReactiveEffect, trackEffects, triggerEffects } from "./effe
 import { reactive } from "./reactive";
 
 
-class RefImpl {
-  private _value: any;
-  private _rawValue: any;
+export class RefImpl<T> {
+  private _value: T;
+  private _rawValue: T;
   public dep: Set<ReactiveEffect>;
   private __v_isRef = true;
 
@@ -44,7 +44,7 @@ function convert(value: any) {
 }
 
 // 收集 ref 依赖
-function trackRefValue(ref: RefImpl) {
+function trackRefValue(ref: RefImpl<unknown>) {
   if(isTracking())
       trackEffects(ref.dep)
 }
