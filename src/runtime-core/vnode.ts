@@ -3,9 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-30 20:51:19
+ * @LastEditTime: 2022-07-31 21:20:23
  */
-export function createVNode(type, props?, children?) {
+export function createVNode(type: any, props?: any, children?: any) {
   const vNode = { 
     type, props, children
   }

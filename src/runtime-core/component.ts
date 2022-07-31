@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-30 20:51:20
+ * @LastEditTime: 2022-07-31 21:43:41
  */
 export function createComponentInstance(vNode: any) {
   const component = {
@@ -50,7 +50,7 @@ function handleSetupResult(instance: any, setupResult: any) {
 function finishComponentSetup(instance: any) {
   const Component = instance.type
 
-  if (!Component.render) {
+  if (Component.render) {
     instance.render = Component.render
   }
 }
