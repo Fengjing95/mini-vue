@@ -3,10 +3,10 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-31 21:41:51
+ * @LastEditTime: 2022-08-01 16:40:24
  */
 import { createApp } from '../lib/guide-mini-vue.esm.js';
 import { App } from './App.js'
 
-const root = document.querySelector('#app');
-createApp(App).mount(root)
+
+createApp(App).mount('#app')
