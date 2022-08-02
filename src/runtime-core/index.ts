@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 统一导出
- * @LastEditTime: 2022-07-31 21:36:56
+ * @LastEditTime: 2022-08-02 21:23:27
  */
-export { createApp } from "./createApp";
-export {h} from "./h"
+export { createApp } from './createApp'
+export { h } from './h'

@@ -1,11 +1,11 @@
-import { publicInstanceProxyHandlers } from "./componentPublicInstance"
+import { publicInstanceProxyHandlers } from './componentPublicInstance'
 
 /*
  * @Date: 2022-07-30 20:23:39
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-02 21:03:43
+ * @LastEditTime: 2022-08-02 21:23:20
  */
 export function createComponentInstance(vNode: any) {
   const component = {
@@ -16,7 +16,6 @@ export function createComponentInstance(vNode: any) {
 
   return component
 }
-
 
 export function setupComponent(instance: any) {
   // TODO
@@ -29,10 +28,10 @@ export function setupComponent(instance: any) {
 function setupStatefulComponent(instance: any) {
   const Component = instance.vNode.type
 
-  instance.proxy = new Proxy({_: instance}, publicInstanceProxyHandlers)
+  instance.proxy = new Proxy({ _: instance }, publicInstanceProxyHandlers)
 
   const { setup } = Component
-  
+
   if (setup) {
     // function | object
     // function: 组件的 render 函数
@@ -46,7 +45,7 @@ function setupStatefulComponent(instance: any) {
 function handleSetupResult(instance: any, setupResult: any) {
   // TODO function
   if (typeof setupResult === 'object') {
-    instance.setupState = setupResult 
+    instance.setupState = setupResult
   }
 
   finishComponentSetup(instance)
@@ -59,4 +58,3 @@ function finishComponentSetup(instance: any) {
     instance.render = Component.render
   }
 }
-

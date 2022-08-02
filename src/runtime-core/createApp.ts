@@ -6,14 +6,14 @@
  * @LastEditTime: 2022-08-02 15:51:16
  */
 
-import { render } from "./renderer"
-import { createVNode } from "./vnode"
+import { render } from './renderer'
+import { createVNode } from './vnode'
 
 export function createApp(rootComponent: any) {
   return {
     mount(rootContainer: string | Element) {
-      if (typeof rootContainer === "string") {
-        rootContainer = document.querySelector(rootContainer);
+      if (typeof rootContainer === 'string') {
+        rootContainer = document.querySelector(rootContainer)
       }
       // 首先转 vNode
       // component => vNode
@@ -24,5 +24,3 @@ export function createApp(rootComponent: any) {
     }
   }
 }
-
-
