@@ -1,14 +1,17 @@
+import { publicInstanceProxyHandlers } from "./componentPublicInstance"
+
 /*
  * @Date: 2022-07-30 20:23:39
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-31 21:43:41
+ * @LastEditTime: 2022-08-02 21:03:43
  */
 export function createComponentInstance(vNode: any) {
   const component = {
     vNode,
-    type: vNode.type
+    type: vNode.type,
+    setupState: {}
   }
 
   return component
@@ -25,6 +28,8 @@ export function setupComponent(instance: any) {
 
 function setupStatefulComponent(instance: any) {
   const Component = instance.vNode.type
+
+  instance.proxy = new Proxy({_: instance}, publicInstanceProxyHandlers)
 
   const { setup } = Component
   

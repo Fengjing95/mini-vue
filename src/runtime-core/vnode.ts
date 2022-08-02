@@ -3,11 +3,14 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-31 21:20:23
+ * @LastEditTime: 2022-08-02 20:10:53
  */
 export function createVNode(type: any, props?: any, children?: any) {
   const vNode = { 
-    type, props, children
+    type,
+    props,
+    children,
+    el: null as Element,
   }
 
   return vNode

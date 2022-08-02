@@ -1,13 +1,13 @@
-import { isObject } from "../shared";
-import { createComponentInstance, setupComponent } from "./component"
-
 /*
  * @Date: 2022-07-30 20:18:41
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-01 16:32:54
+ * @LastEditTime: 2022-08-02 21:14:59
  */
+import { isObject } from "../shared";
+import { createComponentInstance, setupComponent } from "./component"
+
 export function render(vNode: any, container: any) {
   // patch 为了方便后续递归
   patch(vNode, container)
@@ -37,20 +37,22 @@ function processComponent(vNode: any, container: any) {
   mountComponent(vNode, container)
 }
 
-function mountComponent(vNode: any, container: any) {
-  const instance = createComponentInstance(vNode)
+function mountComponent(initialVNode: any, container: any) {
+  const instance = createComponentInstance(initialVNode)
 
   setupComponent(instance)
-  setupRenderEffect(instance, container)
+  setupRenderEffect(instance, initialVNode, container)
 }
 
 
-function setupRenderEffect(instance: any, container: any) {
-  const subTree = instance.render()
+function setupRenderEffect(instance: any,initialVNode: any, container: any) {
+  const {proxy} = instance
+  const subTree = instance.render.call(proxy)
 
-  // vNode -> patch
+  // vNode -> component -> render -> patch
   // vNode -> element -> mountElement
   patch(subTree, container)
+  initialVNode.el = subTree
 }
 
 function processElement(vNode: any, container: any) {
@@ -58,7 +60,7 @@ function processElement(vNode: any, container: any) {
 }
 
 function mountElement(vNode: any, container: any) {
-  const el = document.createElement(vNode.type)
+  const el = vNode.el = document.createElement(vNode.type)
 
   // 内容
   const {children, props} = vNode
