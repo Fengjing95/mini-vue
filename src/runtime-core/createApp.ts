@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-01 16:56:47
+ * @LastEditTime: 2022-08-02 15:51:16
  */
 
 import { render } from "./renderer"
@@ -13,7 +13,7 @@ export function createApp(rootComponent: any) {
   return {
     mount(rootContainer: string | Element) {
       if (typeof rootContainer === "string") {
-        rootContainer = document.querySelector(rootContainer) as Element;
+        rootContainer = document.querySelector(rootContainer);
       }
       // 首先转 vNode
       // component => vNode
