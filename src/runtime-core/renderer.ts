@@ -3,9 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-03 20:08:11
+ * @LastEditTime: 2022-08-03 20:42:56
  */
-import { isObject } from '../shared'
+import { isObject, isOn } from '../shared'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
 
@@ -79,7 +79,12 @@ function mountElement(vNode: any, container: any) {
   // props
   for (let key in props) {
     const val = props[key]
-    el.setAttribute(key, val)
+    if (isOn(key)) {
+      const eventName = key.slice(2).toLowerCase()
+      el.addEventListener(eventName, val)
+    } else {
+      el.setAttribute(key, val)
+    }
   }
 
   container.appendChild(el)

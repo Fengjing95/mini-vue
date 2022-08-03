@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-03 20:07:32
+ * @LastEditTime: 2022-08-03 20:45:14
  */
 import { h } from '../lib/guide-mini-vue.esm.js';
 
@@ -16,11 +16,17 @@ export const App = {
       {
         id: 'root',
         class: ['bg'],
+        onClick: (e) => {
+          console.log('click');
+        },
+        onMouseenter: () => {
+          console.log('enter');
+        }
       },
-      // 'Hi, ' + this.msg,
-      h('p', { class: ['green'] },
-        [h('p', { class: ['red'] }, 'hi'), h('p', { class: ['green'] }, 'mini-vue')]
-      ),
+      'Hi, ' + this.msg,
+      // h('p', { class: ['green'] },
+      //   [h('p', { class: ['red'] }, 'hi'), h('p', { class: ['green'] }, 'mini-vue')]
+      // ),
     )
   },
   setup() {
