@@ -3,9 +3,10 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-02 21:23:22
+ * @LastEditTime: 2022-08-03 20:08:11
  */
 import { isObject } from '../shared'
+import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
 
 export function render(vNode: any, container: any) {
@@ -14,6 +15,7 @@ export function render(vNode: any, container: any) {
 }
 
 function patch(vNode: any, container: any) {
+  const { shapeFlags } = vNode
   /*
    * 处理组件
    * 判断是不是 element,
@@ -21,10 +23,10 @@ function patch(vNode: any, container: any) {
    * 如果是 component 就处理 component
    */
   // console.log(vNode.type);
-  if (typeof vNode.type === 'string') {
+  if (shapeFlags & ShapeFlags.ELEMENT) {
     // element
     processElement(vNode, container)
-  } else if (isObject(vNode.type)) {
+  } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
     // component
     processComponent(vNode, container)
   }
@@ -59,14 +61,14 @@ function mountElement(vNode: any, container: any) {
   const el = (vNode.el = document.createElement(vNode.type))
 
   // 内容
-  const { children, props } = vNode
+  const { children, props, shapeFlags } = vNode
 
-  if (typeof children === 'string') {
+  if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
     // string
     el.textContent = children
-  } else if (Array.isArray(children)) {
+  } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
     // array
-    children.forEach(child => {
+    children.forEach((child: any) => {
       patch(child, el)
     })
   } else {
