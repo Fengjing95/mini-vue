@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-04 17:18:06
+ * @LastEditTime: 2022-08-04 21:20:06
  */
 import { h } from '../lib/guide-mini-vue.esm.js';
 import { Foo } from './Foo.js'
@@ -14,16 +14,17 @@ export const App = {
     window.self = this
 
     return h('div',
-      {
-        id: 'root',
-        class: ['bg'],
-        onClick: (e) => {
-          console.log('click');
-        },
-        onMouseenter: () => {
-          console.log('enter');
-        }
-      },
+      {},
+      // {
+      //   id: 'root',
+      //   class: ['bg'],
+      //   onClick: (e) => {
+      //     console.log('click');
+      //   },
+      //   onMouseenter: () => {
+      //     console.log('enter');
+      //   }
+      // },
       // 'Hi, ' + this.msg,
 
       // h('p', { class: ['green'] },
@@ -32,7 +33,15 @@ export const App = {
 
       [
         h('div', {}, 'Hi, ' + this.msg),
-        h(Foo, { count: 1 })
+        h(Foo, {
+          count: this.count,
+          onAdd(num) {
+            console.log('on-add', num);
+          },
+          onAddFoo() {
+            console.log('add-foo');
+          }
+        })
       ]
     )
   },
@@ -40,6 +49,7 @@ export const App = {
     // composition API
     return {
       msg: 'mini-vue',
+      count: 1
     }
   }
 }

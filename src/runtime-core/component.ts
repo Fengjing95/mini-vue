@@ -3,9 +3,10 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-04 18:25:08
+ * @LastEditTime: 2022-08-04 20:55:14
  */
 import { shallowReadonly } from '../reactivity/reactive'
+import { emit } from './componentEmit'
 import { initProps } from './componentProps'
 import { publicInstanceProxyHandlers } from './componentPublicInstance'
 
@@ -13,8 +14,12 @@ export function createComponentInstance(vNode: any) {
   const component = {
     vNode,
     type: vNode.type,
-    setupState: {}
+    setupState: {},
+    props: {},
+    emit: (args: any): any => {}
   }
+
+  component.emit = emit.bind(null, component)
 
   return component
 }
@@ -38,7 +43,9 @@ function setupStatefulComponent(instance: any) {
     // function | object
     // function: 组件的 render 函数
     // object: 把 object 注入到上下文
-    const setupResult = setup(shallowReadonly(instance.props))
+    const setupResult = setup(shallowReadonly(instance.props), {
+      emit: instance.emit
+    })
 
     handleSetupResult(instance, setupResult)
   }

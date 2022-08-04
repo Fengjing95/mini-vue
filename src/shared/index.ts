@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 工具方法
- * @LastEditTime: 2022-08-04 17:56:36
+ * @LastEditTime: 2022-08-04 21:22:53
  */
 // 继承属性
 export const extend = Object.assign
@@ -23,3 +23,14 @@ export const isOn = (key: string) => {
 // 检查制定对象上是否有 key
 export const hasOwn = (target: any, key: string | symbol) =>
   Object.prototype.hasOwnProperty.call(target, key)
+
+// 首字母转为大写
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1)
+
+// 转为事件命名
+export const toHandlerKey = (str: string) => (str ? 'on' + capitalize(str) : '')
+
+// 转驼峰命名
+export const camelize = (str: string) =>
+  str.replace(/-(\w)/g, (_, c: string) => c.toUpperCase() || '')
