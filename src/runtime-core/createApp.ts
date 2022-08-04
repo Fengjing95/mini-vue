@@ -2,8 +2,8 @@
  * @Date: 2022-07-28 08:16:53
  * @Author: 枫
  * @LastEditors: 枫
- * @description: description
- * @LastEditTime: 2022-08-02 15:51:16
+ * @description: createApp 函数, 主入口
+ * @LastEditTime: 2022-08-04 17:11:09
  */
 
 import { render } from './renderer'

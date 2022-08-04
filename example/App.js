@@ -3,9 +3,10 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-03 20:45:14
+ * @LastEditTime: 2022-08-04 17:18:06
  */
 import { h } from '../lib/guide-mini-vue.esm.js';
+import { Foo } from './Foo.js'
 
 window.self = null // 用于方便获取 app 实例
 export const App = {
@@ -23,10 +24,16 @@ export const App = {
           console.log('enter');
         }
       },
-      'Hi, ' + this.msg,
+      // 'Hi, ' + this.msg,
+
       // h('p', { class: ['green'] },
       //   [h('p', { class: ['red'] }, 'hi'), h('p', { class: ['green'] }, 'mini-vue')]
       // ),
+
+      [
+        h('div', {}, 'Hi, ' + this.msg),
+        h(Foo, { count: 1 })
+      ]
     )
   },
   setup() {

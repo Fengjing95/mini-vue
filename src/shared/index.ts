@@ -2,8 +2,8 @@
  * @Date: 2022-07-03 16:53:26
  * @Author: 枫
  * @LastEditors: 枫
- * @description: description
- * @LastEditTime: 2022-08-03 20:42:03
+ * @description: 工具方法
+ * @LastEditTime: 2022-08-04 17:56:36
  */
 // 继承属性
 export const extend = Object.assign
@@ -19,3 +19,7 @@ export const hasChange = (newValue: any, value: any) =>
 export const isOn = (key: string) => {
   return /^on[A-Z]/.test(key)
 }
+
+// 检查制定对象上是否有 key
+export const hasOwn = (target: any, key: string | symbol) =>
+  Object.prototype.hasOwnProperty.call(target, key)

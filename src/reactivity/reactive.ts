@@ -3,34 +3,46 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-10 13:30:21
-*/
+ * @LastEditTime: 2022-08-04 18:04:50
+ */
 
-import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from './baseHandlers';
+import { isObject } from '../shared'
+import {
+  mutableHandlers,
+  readonlyHandlers,
+  shallowReadonlyHandlers
+} from './baseHandlers'
 
 export function reactive<T extends object>(raw: T): T {
-  return createActiveObject<T>(raw, mutableHandlers)
+  return createReactiveObject<T>(raw, mutableHandlers)
 }
 
 export function readonly<T extends object>(raw: T): Readonly<T> {
-  return createActiveObject<Readonly<T>>(raw, readonlyHandlers)
+  return createReactiveObject<Readonly<T>>(raw, readonlyHandlers)
 }
 
 export function shallowReadonly<T extends object>(raw: T): Readonly<T> {
-  return createActiveObject<Readonly<T>>(raw, shallowReadonlyHandlers)
+  return createReactiveObject<Readonly<T>>(raw, shallowReadonlyHandlers)
 }
 
 export function isProxy(value: unknown) {
-  return isReadonly(value) || isReactive(value);
+  return isReadonly(value) || isReactive(value)
 }
 
-function createActiveObject<T extends object>(raw: T, baseHandlers: any): T {
-  return new Proxy(raw, baseHandlers);
+function createReactiveObject<T extends object>(
+  target: T,
+  baseHandlers: any
+): T {
+  if (!isObject(target)) {
+    console.warn(`target ${target} must be an object`)
+    return target
+  }
+  return new Proxy(target, baseHandlers)
 }
 
 export enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
-  IS_READONLY = '__v_isReadonly',
+  IS_READONLY = '__v_isReadonly'
 }
 
 export function isReactive(value: any) {
