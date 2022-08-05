@@ -3,10 +3,10 @@
 * @Author: 枫
  * @LastEditors: 枫
 * @description: Foo组件
- * @LastEditTime: 2022-08-04 21:19:45
+ * @LastEditTime: 2022-08-05 21:09:10
 */
 
-import { h } from "../lib/guide-mini-vue.esm.js";
+import { h } from "../../lib/guide-mini-vue.esm.js";
 export const Foo = {
   setup(props, { emit }) {
 

@@ -3,12 +3,13 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-04 20:55:14
+ * @LastEditTime: 2022-08-05 21:30:10
  */
 import { shallowReadonly } from '../reactivity/reactive'
 import { emit } from './componentEmit'
 import { initProps } from './componentProps'
 import { publicInstanceProxyHandlers } from './componentPublicInstance'
+import { initSlots } from './componentSlots'
 
 export function createComponentInstance(vNode: any) {
   const component = {
@@ -16,6 +17,7 @@ export function createComponentInstance(vNode: any) {
     type: vNode.type,
     setupState: {},
     props: {},
+    slots: {},
     emit: (args: any): any => {}
   }
 
@@ -25,9 +27,8 @@ export function createComponentInstance(vNode: any) {
 }
 
 export function setupComponent(instance: any) {
-  // TODO
   initProps(instance, instance.vNode.props)
-  // initSlots()
+  initSlots(instance, instance.vNode.children)
 
   setupStatefulComponent(instance)
 }

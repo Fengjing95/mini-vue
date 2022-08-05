@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-03 20:03:32
+ * @LastEditTime: 2022-08-05 22:30:22
  */
 import { ShapeFlags } from '../shared/ShapeFlags'
 
@@ -21,6 +21,13 @@ export function createVNode(type: any, props?: any, children?: any) {
     vNode.shapeFlags |= ShapeFlags.TEXT_CHILDREN
   } else if (Array.isArray(children)) {
     vNode.shapeFlags |= ShapeFlags.ARRAY_CHILDREN
+  }
+
+  // 组件 + children object
+  if (vNode.shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+    if (typeof children === 'object') {
+      vNode.shapeFlags = ShapeFlags.SLOT_CHILDREN
+    }
   }
 
   return vNode

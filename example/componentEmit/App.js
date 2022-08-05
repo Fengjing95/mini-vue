@@ -3,9 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-04 21:20:06
+ * @LastEditTime: 2022-08-05 21:12:28
  */
-import { h } from '../lib/guide-mini-vue.esm.js';
+import { h } from '../../lib/guide-mini-vue.esm.js';
 import { Foo } from './Foo.js'
 
 window.self = null // 用于方便获取 app 实例
