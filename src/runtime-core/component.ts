@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-05 21:30:10
+ * @LastEditTime: 2022-08-06 23:16:11
  */
 import { shallowReadonly } from '../reactivity/reactive'
 import { emit } from './componentEmit'
@@ -41,12 +41,14 @@ function setupStatefulComponent(instance: any) {
   const { setup } = Component
 
   if (setup) {
+    setCurrentInstance(instance)
     // function | object
     // function: 组件的 render 函数
     // object: 把 object 注入到上下文
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit
     })
+    setCurrentInstance(null)
 
     handleSetupResult(instance, setupResult)
   }
@@ -67,4 +69,13 @@ function finishComponentSetup(instance: any) {
   if (Component.render) {
     instance.render = Component.render
   }
+}
+
+let currentInstance: any = null
+export function getCurrentInstance() {
+  return currentInstance
+}
+
+function setCurrentInstance(instance: any) {
+  currentInstance = instance
 }
