@@ -4,9 +4,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-05 22:26:43
+ * @LastEditTime: 2022-08-06 22:59:34
  */
-import { h } from '../../lib/guide-mini-vue.esm.js';
+import { h, createTextNode } from '../../lib/guide-mini-vue.esm.js';
 import { Foo } from './Foo.js'
 
 export const App = {
@@ -16,7 +16,10 @@ export const App = {
       [
         h('div', {}, 'App'),
         h(Foo, {}, {
-          main: ({ age }) => h('p', {}, 'age: ' + age),
+          main: ({ age }) => [
+            h('p', {}, 'age: ' + age),
+            createTextNode('hello')
+          ],
           footer: () => h('div', {}, '456')
         })
       ]

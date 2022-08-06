@@ -3,9 +3,12 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-06 22:37:01
+ * @LastEditTime: 2022-08-06 22:56:26
  */
 import { ShapeFlags } from '../shared/ShapeFlags'
+
+export const Fragment = Symbol('Fragment')
+export const Text = Symbol('Text')
 
 export function createVNode(type: any, props?: any, children?: any) {
   const vNode = {
@@ -37,4 +40,8 @@ function getShapeFlags(type: any) {
   return typeof type === 'string'
     ? ShapeFlags.ELEMENT
     : ShapeFlags.STATEFUL_COMPONENT
+}
+
+export function createTextNode(text: string) {
+  return createVNode(Text, {}, text)
 }

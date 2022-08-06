@@ -3,11 +3,12 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-03 20:42:56
+ * @LastEditTime: 2022-08-06 22:59:13
  */
 import { isObject, isOn } from '../shared'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
+import { Fragment, Text } from './vnode'
 
 export function render(vNode: any, container: any) {
   // patch 为了方便后续递归
@@ -15,20 +16,28 @@ export function render(vNode: any, container: any) {
 }
 
 function patch(vNode: any, container: any) {
-  const { shapeFlags } = vNode
-  /*
-   * 处理组件
-   * 判断是不是 element,
-   * 如果是 element 则处理 element,
-   * 如果是 component 就处理 component
-   */
-  // console.log(vNode.type);
-  if (shapeFlags & ShapeFlags.ELEMENT) {
-    // element
-    processElement(vNode, container)
-  } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
-    // component
-    processComponent(vNode, container)
+  const { type, shapeFlags } = vNode
+
+  switch (type) {
+    case Fragment:
+      mountChildren(vNode.children, container)
+      break
+
+    case Text:
+      processText(vNode, container)
+      break
+
+    default:
+      // console.log(vNode.type);
+      if (shapeFlags & ShapeFlags.ELEMENT) {
+        //  * 如果是 element 则处理 element,
+        // element
+        processElement(vNode, container)
+      } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+        // * 如果是 component 就处理 component
+        // component
+        processComponent(vNode, container)
+      }
   }
 }
 
@@ -68,9 +77,7 @@ function mountElement(vNode: any, container: any) {
     el.textContent = children
   } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
     // array
-    children.forEach((child: any) => {
-      patch(child, el)
-    })
+    mountChildren(children, el)
   } else {
     // vnode
     patch(children, el)
@@ -88,4 +95,16 @@ function mountElement(vNode: any, container: any) {
   }
 
   container.appendChild(el)
+}
+function mountChildren(children: any, container: any) {
+  children.forEach((child: any) => {
+    patch(child, container)
+  })
+}
+
+function processText(vNode: any, container: any) {
+  const { children } = vNode
+
+  const textNode = document.createTextNode(children)
+  container.appendChild(textNode)
 }

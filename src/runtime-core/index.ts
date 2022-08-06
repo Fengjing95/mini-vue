@@ -3,8 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 统一导出
- * @LastEditTime: 2022-08-05 21:38:23
+ * @LastEditTime: 2022-08-06 22:57:15
  */
 export { createApp } from './createApp'
 export { h } from './h'
 export { renderSlots } from './helpers/renderSlots'
+export { createTextNode } from './vnode'
