@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-06 23:16:11
+ * @LastEditTime: 2022-08-07 21:59:04
  */
 import { shallowReadonly } from '../reactivity/reactive'
 import { emit } from './componentEmit'
@@ -11,13 +11,17 @@ import { initProps } from './componentProps'
 import { publicInstanceProxyHandlers } from './componentPublicInstance'
 import { initSlots } from './componentSlots'
 
-export function createComponentInstance(vNode: any) {
+export function createComponentInstance(vNode: any, parent: any) {
+  // console.log(parent)
+
   const component = {
     vNode,
     type: vNode.type,
     setupState: {},
     props: {},
     slots: {},
+    provides: parent?.provides || {},
+    parent,
     emit: (args: any): any => {}
   }
 
