@@ -3,11 +3,11 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 统一导出
- * @LastEditTime: 2022-08-07 21:13:34
+ * @LastEditTime: 2022-08-08 18:36:48
  */
-export { createApp } from './createApp'
 export { h } from './h'
 export { renderSlots } from './helpers/renderSlots'
 export { createTextNode } from './vnode'
 export { getCurrentInstance } from './component'
 export { provide, inject } from './apiInject'
+export { createRender } from './renderer'

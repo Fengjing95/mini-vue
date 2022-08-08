@@ -3,6 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: mini-vue 出口
- * @LastEditTime: 2022-08-02 21:23:32
+ * @LastEditTime: 2022-08-08 18:40:06
  */
-export * from './runtime-core'
+
+export * from './runtime-dom'
