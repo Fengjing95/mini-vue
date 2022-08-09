@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: ref
- * @LastEditTime: 2022-08-09 19:43:31
+ * @LastEditTime: 2022-08-09 23:27:49
  */
 
 import { hasChange, isObject } from '../shared'
@@ -52,7 +52,7 @@ function trackRefValue(ref: RefImpl<unknown>) {
   if (isTracking()) trackEffects(ref.dep)
 }
 
-export function ref(value: any) {
+export function ref<T>(value: T): RefImpl<T> {
   return new RefImpl(value)
 }
 

@@ -1,11 +1,11 @@
-import { extend } from './../shared/index'
 /*
  * @Date: 2022-07-03 22:48:13
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-09 19:44:56
+ * @LastEditTime: 2022-08-09 23:29:56
  */
+import { extend } from './../shared/index'
 import { isObject } from '../shared'
 import { track, trigger } from './effect'
 import { reactive, ReactiveFlags, readonly } from './reactive'
