@@ -3,7 +3,8 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: mini-vue 出口
- * @LastEditTime: 2022-08-08 18:40:06
+ * @LastEditTime: 2022-08-09 17:45:41
  */
 
 export * from './runtime-dom'
+export * from './reactivity'

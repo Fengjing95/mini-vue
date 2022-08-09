@@ -3,8 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-08 19:16:13
+ * @LastEditTime: 2022-08-09 20:39:32
  */
+import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
 import { createAppAPI } from './createApp'
@@ -17,23 +18,25 @@ export function createRender(options: any): any {
     insert: hostInsert
   } = options
 
-  function render(vNode: any, container: any, parentComponent: any) {
+  function render(vNode: any, container: any) {
     // patch 为了方便后续递归
-    patch(vNode, container, null)
+    patch(null, vNode, container, null)
   }
 
-  function patch(vNode: any, container: any, parentComponent: any) {
+  // n1 -> 旧的节点
+  // n2 -> 新的节点
+  function patch(n1: any, n2: any, container: any, parentComponent: any) {
     // FIXME 是否如此解决
-    if (!vNode) return
-    const { type, shapeFlags } = vNode
+    if (!n2) return
+    const { type, shapeFlags } = n2
 
     switch (type) {
       case Fragment:
-        mountChildren(vNode.children, container, parentComponent)
+        processFragment(n1, n2.children, container, parentComponent)
         break
 
       case Text:
-        processText(vNode, container)
+        processText(n1, n2, container)
         break
 
       default:
@@ -41,17 +44,22 @@ export function createRender(options: any): any {
         if (shapeFlags & ShapeFlags.ELEMENT) {
           //  * 如果是 element 则处理 element,
           // element
-          processElement(vNode, container, parentComponent)
+          processElement(n1, n2, container, parentComponent)
         } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
           // * 如果是 component 就处理 component
           // component
-          processComponent(vNode, container, parentComponent)
+          processComponent(n1, n2, container, parentComponent)
         }
     }
   }
 
-  function processComponent(vNode: any, container: any, parentComponent: any) {
-    mountComponent(vNode, container, parentComponent)
+  function processComponent(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
+    mountComponent(n2, container, parentComponent)
   }
 
   function mountComponent(
@@ -66,17 +74,47 @@ export function createRender(options: any): any {
   }
 
   function setupRenderEffect(instance: any, initialVNode: any, container: any) {
-    const { proxy } = instance
-    const subTree = instance.render.call(proxy)
+    effect(() => {
+      if (!instance.isMounted) {
+        // 初始化
+        const { proxy } = instance
+        const subTree = (instance.subTree = instance.render.call(proxy))
 
-    // vNode -> component -> render -> patch
-    // vNode -> element -> mountElement
-    patch(subTree, container, instance)
-    initialVNode.el = subTree
+        // vNode -> component -> render -> patch
+        // vNode -> element -> mountElement
+        patch(null, subTree, container, instance)
+        initialVNode.el = subTree
+        // init 完成将标识位状态修改
+        instance.isMounted = true
+      } else {
+        // 更新
+        const { proxy } = instance
+        // 取出当次的 subTree 和上一次的 subTree
+        const subTree = instance.render.call(proxy)
+        const prevSubTree = instance.subTree
+        patch(prevSubTree, subTree, container, instance)
+        // 更新subTree 用于下一次 update
+        instance.subTree = subTree
+      }
+    })
   }
 
-  function processElement(vNode: any, container: any, parentComponent: any) {
-    mountElement(vNode, container, parentComponent)
+  function processElement(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
+    if (!n1)
+      // 首次渲染
+      mountElement(n2, container, parentComponent)
+    // update
+    else patchElement(n1, n2, container)
+  }
+
+  function patchElement(n1: any, n2: any, container: any) {
+    console.log('n1', n1)
+    console.log('n2', n2)
   }
 
   function mountElement(vNode: any, container: any, parentComponent: any) {
@@ -91,9 +129,6 @@ export function createRender(options: any): any {
     } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
       // array
       mountChildren(children, el, parentComponent)
-    } else {
-      // vnode
-      patch(children, el, parentComponent)
     }
 
     // props
@@ -113,15 +148,24 @@ export function createRender(options: any): any {
   }
   function mountChildren(children: any, container: any, parentComponent: any) {
     children.forEach((child: any) => {
-      patch(child, container, parentComponent)
+      patch(null, child, container, parentComponent)
     })
   }
 
-  function processText(vNode: any, container: any) {
-    const { children } = vNode
+  function processText(n1: any, n2: any, container: any) {
+    const { children } = n2
 
     const textNode = document.createTextNode(children)
     container.appendChild(textNode)
+  }
+
+  function processFragment(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
+    mountChildren(n2, container, parentComponent)
   }
 
   return {

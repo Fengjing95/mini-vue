@@ -3,8 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-07 21:59:04
+ * @LastEditTime: 2022-08-09 20:01:39
  */
+import { proxyRefs } from '../reactivity'
 import { shallowReadonly } from '../reactivity/reactive'
 import { emit } from './componentEmit'
 import { initProps } from './componentProps'
@@ -22,7 +23,8 @@ export function createComponentInstance(vNode: any, parent: any) {
     slots: {},
     provides: parent?.provides || {},
     parent,
-    emit: (args: any): any => {}
+    emit: (args: any): any => {},
+    isMounted: false
   }
 
   component.emit = emit.bind(null, component)
@@ -61,7 +63,7 @@ function setupStatefulComponent(instance: any) {
 function handleSetupResult(instance: any, setupResult: any) {
   // TODO function
   if (typeof setupResult === 'object') {
-    instance.setupState = setupResult
+    instance.setupState = proxyRefs(setupResult)
   }
 
   finishComponentSetup(instance)
