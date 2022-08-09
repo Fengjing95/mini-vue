@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: dom平台的渲染
- * @LastEditTime: 2022-08-08 18:39:49
+ * @LastEditTime: 2022-08-09 23:02:41
  */
 import { createRender } from '../runtime-core'
 import { isOn } from '../shared'
@@ -12,12 +12,16 @@ function createElement(type: any) {
   return document.createElement(type)
 }
 
-function patchProps(el: any, key: string, val: any) {
+function patchProps(el: any, key: string, prevValue: any, nextVal: any) {
   if (isOn(key)) {
     const eventName = key.slice(2).toLowerCase()
-    el.addEventListener(eventName, val)
+    el.addEventListener(eventName, nextVal)
   } else {
-    el.setAttribute(key, val)
+    if (nextVal === undefined || nextVal === null) {
+      el.removeAttribute(key)
+    } else {
+      el.setAttribute(key, nextVal)
+    }
   }
 }
 

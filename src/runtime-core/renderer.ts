@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-09 20:39:32
+ * @LastEditTime: 2022-08-09 23:16:17
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
@@ -115,6 +115,38 @@ export function createRender(options: any): any {
   function patchElement(n1: any, n2: any, container: any) {
     console.log('n1', n1)
     console.log('n2', n2)
+
+    // 比对 props 差异
+    const oldProps = n1.props || EMPTY_OBJ
+    const newProps = n2.props || EMPTY_OBJ
+
+    const el = (n2.el = n1.el)
+    patchProps(el, oldProps, newProps)
+  }
+
+  // 空对象, {} !== {} 恒为 true
+  const EMPTY_OBJ = {}
+
+  function patchProps(el: any, oldProps: any, newProps: any) {
+    if (oldProps !== newProps) {
+      // props 是否变化或者是否为 undefined 的情况
+      for (const key in newProps) {
+        const prevProp = oldProps[key]
+        const nextProp = newProps[key]
+
+        if (prevProp !== nextProp) {
+          hostPatchProps(el, key, prevProp, nextProp)
+        }
+      }
+      if (oldProps !== EMPTY_OBJ) {
+        // props 消失的情况
+        for (const key in oldProps) {
+          if (!(key in newProps)) {
+            hostPatchProps(el, key, oldProps[key], null)
+          }
+        }
+      }
+    }
   }
 
   function mountElement(vNode: any, container: any, parentComponent: any) {
@@ -140,7 +172,7 @@ export function createRender(options: any): any {
       // } else {
       //   el.setAttribute(key, val)
       // }
-      hostPatchProps(el, key, val)
+      hostPatchProps(el, key, null, val)
     }
 
     // container.appendChild(el)
