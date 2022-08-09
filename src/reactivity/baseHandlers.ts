@@ -1,25 +1,22 @@
-import { extend } from './../shared/index';
+import { extend } from './../shared/index'
 /*
  * @Date: 2022-07-03 22:48:13
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-07-10 13:18:05
+ * @LastEditTime: 2022-08-09 19:44:56
  */
-import { isObject } from "../shared";
-import { track, trigger } from "./effect";
-import { reactive, ReactiveFlags, readonly } from "./reactive";
-
+import { isObject } from '../shared'
+import { track, trigger } from './effect'
+import { reactive, ReactiveFlags, readonly } from './reactive'
 
 // 返回 getter
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Record<any, any>, key: string | symbol) {
-    if (key === ReactiveFlags.IS_REACTIVE)
-      return !isReadonly
-    else if (key === ReactiveFlags.IS_READONLY)
-      return isReadonly
+    if (key === ReactiveFlags.IS_REACTIVE) return !isReadonly
+    else if (key === ReactiveFlags.IS_READONLY) return isReadonly
 
-    const res = Reflect.get(target, key);
+    const res = Reflect.get(target, key)
 
     if (shallow) {
       // 如果只是浅层代理直接返回
@@ -32,16 +29,19 @@ function createGetter(isReadonly = false, shallow = false) {
     }
 
     // 如果不是 readonly 收集依赖
-    if (!isReadonly)
-      track(target, key);
-    return res;
+    if (!isReadonly) track(target, key)
+    return res
   }
 }
 
 // 返回 setter
 function createSetter() {
-  return function set(target: Record<any, any>, key: string | symbol, value: any) {
-    const res = Reflect.set(target, key, value);
+  return function set(
+    target: Record<any, any>,
+    key: string | symbol,
+    value: any
+  ) {
+    const res = Reflect.set(target, key, value)
     trigger(target, key)
     return res
   }
@@ -54,7 +54,7 @@ const set = createSetter()
 // reactive 的 Proxy handler
 export const mutableHandlers = {
   get,
-  set,
+  set
 }
 
 // readonly 的 getter

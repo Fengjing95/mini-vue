@@ -1,14 +1,14 @@
 /*
-* @Date: 2022-06-29 20:56:16
-* @Author: 枫
+ * @Date: 2022-06-29 20:56:16
+ * @Author: 枫
  * @LastEditors: 枫
-* @description: description
- * @LastEditTime: 2022-07-18 21:43:46
-*/
-import { extend } from "../shared"
+ * @description: description
+ * @LastEditTime: 2022-08-09 19:45:01
+ */
+import { extend } from '../shared'
 
-let activeEffect: ReactiveEffect;
-let shouldTrack: boolean;
+let activeEffect: ReactiveEffect
+let shouldTrack: boolean
 
 export class ReactiveEffect {
   private _fn: Function
@@ -47,8 +47,7 @@ export class ReactiveEffect {
   }
 }
 
-
-// 清除依赖 
+// 清除依赖
 function cleanupEffect(effect: ReactiveEffect) {
   effect.deps.forEach(dep => {
     dep.delete(effect)
@@ -56,7 +55,6 @@ function cleanupEffect(effect: ReactiveEffect) {
   // 上面清理之后的 deps 内容是空 set, 已经没有用了, 可以直接清空
   effect.deps.length = 0
 }
-
 
 export function effect(fn: Function, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler)
@@ -71,11 +69,9 @@ export function effect(fn: Function, options: any = {}) {
   return runner
 }
 
-
 export function stop(runner: any) {
   runner.effect.stop()
 }
-
 
 const targetMap = new WeakMap<object, Map<keyof any, Set<ReactiveEffect>>>()
 
@@ -85,12 +81,12 @@ export function track<T extends object>(target: T, key: keyof T) {
   let depsMap = targetMap.get(target)
 
   if (!depsMap) {
-    targetMap.set(target, depsMap = new Map())
+    targetMap.set(target, (depsMap = new Map()))
   }
 
   let dep = depsMap.get(key)
   if (!dep) {
-    depsMap.set(key, dep = new Set<ReactiveEffect>())
+    depsMap.set(key, (dep = new Set<ReactiveEffect>()))
   }
 
   trackEffects(dep)
@@ -119,15 +115,13 @@ export function trigger<T extends object>(target: T, key: keyof T) {
   let depsMap = targetMap.get(target)
 
   let dep = depsMap!.get(key) as Set<ReactiveEffect>
-  
+
   triggerEffects(dep)
 }
 
 export function triggerEffects(dep: Set<ReactiveEffect>) {
   for (const effect of dep) {
-    if (effect.scheduler)
-      effect.scheduler()
-    else
-      effect.run()
+    if (effect.scheduler) effect.scheduler()
+    else effect.run()
   }
 }

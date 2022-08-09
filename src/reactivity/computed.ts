@@ -1,13 +1,13 @@
 /*
-* @Date: 2022-07-19 21:13:54
-* @Author: 枫
+ * @Date: 2022-07-19 21:13:54
+ * @Author: 枫
  * @LastEditors: 枫
-* @description: description
- * @LastEditTime: 2022-07-28 08:03:41
-*/
+ * @description: description
+ * @LastEditTime: 2022-08-09 19:44:58
+ */
 
-import { ReactiveEffect } from "./effect";
-import { RefImpl } from "./ref";
+import { ReactiveEffect } from './effect'
+import { RefImpl } from './ref'
 
 // export class ComputedImpl<T> {
 //   private _getter: () => T
@@ -19,7 +19,6 @@ import { RefImpl } from "./ref";
 //     return this._getter()
 //   }
 // }
-
 
 // export function computed<T>(options: {
 //   get: () => T,
@@ -38,11 +37,11 @@ import { RefImpl } from "./ref";
 
 export class ComputedImpl<T> {
   private _getter: () => T
-  private _dirty: boolean = true;
-  private _value: T | null = null;
-  private _effect: ReactiveEffect;
+  private _dirty: boolean = true
+  private _value: T | null = null
+  private _effect: ReactiveEffect
   constructor(getter: () => T) {
-    this._getter = getter;
+    this._getter = getter
 
     this._effect = new ReactiveEffect(getter, () => {
       if (!this._dirty) {
