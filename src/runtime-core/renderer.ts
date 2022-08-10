@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-09 23:16:17
+ * @LastEditTime: 2022-08-10 18:12:28
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
@@ -15,7 +15,9 @@ export function createRender(options: any): any {
   const {
     createElement: hostCreateElement,
     patchProps: hostPatchProps,
-    insert: hostInsert
+    insert: hostInsert,
+    remove: hostRemove,
+    setElementText: hostSetElementText
   } = options
 
   function render(vNode: any, container: any) {
@@ -32,7 +34,7 @@ export function createRender(options: any): any {
 
     switch (type) {
       case Fragment:
-        processFragment(n1, n2.children, container, parentComponent)
+        processFragment(n1, n2, container, parentComponent)
         break
 
       case Text:
@@ -109,10 +111,15 @@ export function createRender(options: any): any {
       // 首次渲染
       mountElement(n2, container, parentComponent)
     // update
-    else patchElement(n1, n2, container)
+    else patchElement(n1, n2, container, parentComponent)
   }
 
-  function patchElement(n1: any, n2: any, container: any) {
+  function patchElement(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
     console.log('n1', n1)
     console.log('n2', n2)
 
@@ -122,6 +129,54 @@ export function createRender(options: any): any {
 
     const el = (n2.el = n1.el)
     patchProps(el, oldProps, newProps)
+
+    patchChildren(n1, n2, el, parentComponent)
+  }
+
+  function patchChildren(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
+    const prevShapeFlags = n1.shapeFlags
+    const shapeFlags = n2.shapeFlags
+
+    const c1 = n1.children
+    const c2 = n2.children
+
+    if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
+      // 原值是 text 类型
+      if (prevShapeFlags & ShapeFlags.ARRAY_CHILDREN) {
+        // array -> text
+        // 1 把老的children 清除;
+        unmountChildren(n1.children)
+        // 当 array -> text 时, c1 一定不等于 c2,所以可以省略
+        // // 2 设置 text
+        // hostSetElementText(container, c2)
+      }
+      // else {
+      if (c1 !== c2) {
+        hostSetElementText(container, c2)
+      }
+      // }
+    } else {
+      // 原值是 array
+      if (prevShapeFlags & ShapeFlags.TEXT_CHILDREN) {
+        // 清空文本
+        hostSetElementText(container, '')
+        // mount children
+        mountChildren(c2, container, parentComponent)
+      }
+    }
+  }
+
+  function unmountChildren(children: any) {
+    for (let i = 0; i < children.length; i++) {
+      const el = children[i].el
+      // remove
+      hostRemove(el)
+    }
   }
 
   // 空对象, {} !== {} 恒为 true
@@ -197,7 +252,7 @@ export function createRender(options: any): any {
     container: any,
     parentComponent: any
   ) {
-    mountChildren(n2, container, parentComponent)
+    mountChildren(n2.children, container, parentComponent)
   }
 
   return {
