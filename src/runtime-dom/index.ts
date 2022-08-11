@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: dom平台的渲染
- * @LastEditTime: 2022-08-10 17:05:03
+ * @LastEditTime: 2022-08-11 22:41:23
  */
 import { createRender } from '../runtime-core'
 import { isOn } from '../shared'
@@ -34,7 +34,7 @@ function insert(el: any, parent: any) {
 
 // 移除节点
 function remove(child: any) {
-  const parent = child.parent
+  const parent = child.parentNode
   if (parent) {
     parent.removeChild(child)
   }
