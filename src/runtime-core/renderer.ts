@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-13 19:27:58
+ * @LastEditTime: 2022-08-13 21:28:25
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
@@ -293,7 +293,7 @@ export function createRender(options: any): any {
           newIndex = keyToNewIndexMap.get(prevChild.key)
         } else {
           // 没有 key 使用循环方案
-          for (let l = i; l < e2; l++) {
+          for (let l = i; l <= e2; l++) {
             if (isSameVNodeType(prevChild, c2[l])) {
               // 找到相同的节点记录新的 index, 跳出
               newIndex = l
