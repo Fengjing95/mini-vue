@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: dom平台的渲染
- * @LastEditTime: 2022-08-11 22:41:23
+ * @LastEditTime: 2022-08-11 22:36:41
  */
 import { createRender } from '../runtime-core'
 import { isOn } from '../shared'
@@ -28,8 +28,9 @@ function patchProps(el: any, key: string, prevValue: any, nextVal: any) {
 }
 
 // 插入节点
-function insert(el: any, parent: any) {
-  parent.appendChild(el)
+function insert(child: any, parent: any, anchor: any) {
+  // parent.appendChild(el)
+  parent.insertBefore(child, anchor || null)
 }
 
 // 移除节点

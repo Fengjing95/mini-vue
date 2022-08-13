@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-06 22:56:26
+ * @LastEditTime: 2022-08-11 18:20:35
  */
 import { ShapeFlags } from '../shared/ShapeFlags'
 
@@ -14,6 +14,7 @@ export function createVNode(type: any, props?: any, children?: any) {
   const vNode = {
     type,
     props,
+    key: props?.key,
     children,
     shapeFlags: getShapeFlags(type),
     el: null as Element
