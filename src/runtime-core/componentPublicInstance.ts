@@ -3,14 +3,15 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 代理组建绑定器
- * @LastEditTime: 2022-08-05 21:21:43
+ * @LastEditTime: 2022-08-14 21:21:21
  */
 
 import { hasOwn } from '../shared'
 
 const publicPropertiesMap: Record<string | symbol, (i: any) => any> = {
   $el: (i: any) => i.vNode.el,
-  $slots: (i: any) => i.slots
+  $slots: (i: any) => i.slots,
+  $props: i => i.props
 }
 
 export const publicInstanceProxyHandlers = {

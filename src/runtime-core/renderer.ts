@@ -3,11 +3,12 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-13 21:28:25
+ * @LastEditTime: 2022-08-14 22:20:40
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
+import { shouldUpdateComponent } from './componentUpdateUtils'
 import { createAppAPI } from './createApp'
 import { Fragment, Text } from './vnode'
 
@@ -68,7 +69,28 @@ export function createRender(options: any): any {
     parentComponent: any,
     anchor: any
   ) {
-    mountComponent(n2, container, parentComponent, anchor)
+    if (!n1) {
+      // 没有老节点,新增
+      mountComponent(n2, container, parentComponent, anchor)
+    } else {
+      // 有老节点, 更新
+      updateComponent(n1, n2)
+    }
+  }
+
+  function updateComponent(n1: any, n2: any) {
+    // 获取组件实例, 并且保存袋虚拟节点
+    const instance = (n2.component = n1.component)
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2
+
+      // 执行 effect runner
+      instance.update()
+    } else {
+      // 组件不更新也要保存状态, 否则下次更新将会丢失
+      n2.el = n1.el
+      n2.vNode = n2
+    }
   }
 
   function mountComponent(
@@ -77,7 +99,10 @@ export function createRender(options: any): any {
     parentComponent: any,
     anchor: any
   ) {
-    const instance = createComponentInstance(initialVNode, parentComponent)
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ))
 
     setupComponent(instance)
     setupRenderEffect(instance, initialVNode, container, anchor)
@@ -89,7 +114,7 @@ export function createRender(options: any): any {
     container: any,
     anchor: any
   ) {
-    effect(() => {
+    instance.update = effect(() => {
       if (!instance.isMounted) {
         // 初始化
         const { proxy } = instance
@@ -102,6 +127,12 @@ export function createRender(options: any): any {
         // init 完成将标识位状态修改
         instance.isMounted = true
       } else {
+        const { next, vNode } = instance
+        if (next) {
+          next.el = vNode.el
+          updateComponentPreRender(instance, next)
+        }
+
         // 更新
         const { proxy } = instance
         // 取出当次的 subTree 和上一次的 subTree
@@ -112,6 +143,13 @@ export function createRender(options: any): any {
         instance.subTree = subTree
       }
     })
+  }
+
+  function updateComponentPreRender(instance: any, nextVNode: any) {
+    instance.vNode = nextVNode
+    instance.next = null
+
+    instance.props = nextVNode.props
   }
 
   function processElement(

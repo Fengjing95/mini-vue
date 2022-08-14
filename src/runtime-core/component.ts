@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-09 20:01:39
+ * @LastEditTime: 2022-08-14 21:51:05
  */
 import { proxyRefs } from '../reactivity'
 import { shallowReadonly } from '../reactivity/reactive'
@@ -24,7 +24,8 @@ export function createComponentInstance(vNode: any, parent: any) {
     provides: parent?.provides || {},
     parent,
     emit: (args: any): any => {},
-    isMounted: false
+    isMounted: false,
+    next: null as any
   }
 
   component.emit = emit.bind(null, component)
