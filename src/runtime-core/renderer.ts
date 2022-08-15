@@ -3,13 +3,14 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-14 22:20:40
+ * @LastEditTime: 2022-08-15 14:19:33
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
 import { shouldUpdateComponent } from './componentUpdateUtils'
 import { createAppAPI } from './createApp'
+import { queueJobs } from './scheduler'
 import { Fragment, Text } from './vnode'
 
 export function createRender(options: any): any {
@@ -35,6 +36,8 @@ export function createRender(options: any): any {
     parentComponent: any,
     anchor: any
   ) {
+    // console.log(n1, n2)
+
     // FIXME 是否如此解决
     if (!n2) return
     const { type, shapeFlags } = n2
@@ -114,35 +117,43 @@ export function createRender(options: any): any {
     container: any,
     anchor: any
   ) {
-    instance.update = effect(() => {
-      if (!instance.isMounted) {
-        // 初始化
-        const { proxy } = instance
-        const subTree = (instance.subTree = instance.render.call(proxy))
+    instance.update = effect(
+      () => {
+        if (!instance.isMounted) {
+          // 初始化
+          const { proxy } = instance
+          const subTree = (instance.subTree = instance.render.call(proxy))
 
-        // vNode -> component -> render -> patch
-        // vNode -> element -> mountElement
-        patch(null, subTree, container, instance, anchor)
-        initialVNode.el = subTree
-        // init 完成将标识位状态修改
-        instance.isMounted = true
-      } else {
-        const { next, vNode } = instance
-        if (next) {
-          next.el = vNode.el
-          updateComponentPreRender(instance, next)
+          // vNode -> component -> render -> patch
+          // vNode -> element -> mountElement
+          patch(null, subTree, container, instance, anchor)
+          initialVNode.el = subTree
+          // init 完成将标识位状态修改
+          instance.isMounted = true
+        } else {
+          const { next, vNode } = instance
+          if (next) {
+            next.el = vNode.el
+            updateComponentPreRender(instance, next)
+          }
+
+          // 更新
+          const { proxy } = instance
+          // 取出当次的 subTree 和上一次的 subTree
+          const subTree = instance.render.call(proxy)
+          const prevSubTree = instance.subTree
+          patch(prevSubTree, subTree, container, instance, anchor)
+          // 更新subTree 用于下一次 update
+          instance.subTree = subTree
         }
-
-        // 更新
-        const { proxy } = instance
-        // 取出当次的 subTree 和上一次的 subTree
-        const subTree = instance.render.call(proxy)
-        const prevSubTree = instance.subTree
-        patch(prevSubTree, subTree, container, instance, anchor)
-        // 更新subTree 用于下一次 update
-        instance.subTree = subTree
+      },
+      {
+        scheduler() {
+          // console.log('update-scheduler')
+          queueJobs(instance.update)
+        }
       }
-    })
+    )
   }
 
   function updateComponentPreRender(instance: any, nextVNode: any) {
