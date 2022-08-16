@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: parse
- * @LastEditTime: 2022-08-16 15:28:38
+ * @LastEditTime: 2022-08-16 17:11:41
  */
 
 import { NodeTypes } from './ast'
@@ -18,34 +18,61 @@ const enum TagType {
 export function baseParse(content: string) {
   const context = createParseContext(content)
 
-  return createRoot(parseChildren(context))
+  return createRoot(parseChildren(context, []))
 }
 
-function parseChildren(context: ContextType) {
+function parseChildren(context: ContextType, ancestors: any[]) {
   const nodes = []
 
-  let node
-  const s = context.source
-  if (s.startsWith('{{')) {
-    node = parseInterpolation(context)
-  } else if (s[0] === '<') {
-    if (/[a-z]/i.test(s[1])) {
-      node = parseElement(context)
+  while (!isEnd(context, ancestors)) {
+    let node
+    const s = context.source
+    if (s.startsWith('{{')) {
+      node = parseInterpolation(context)
+    } else if (s[0] === '<') {
+      if (/[a-z]/i.test(s[1])) {
+        node = parseElement(context, ancestors)
+      }
     }
+
+    if (!node) {
+      // 如果不是插值和 element
+      node = parseText(context)
+    }
+
+    nodes.push(node)
   }
-
-  if (!node) {
-    // 如果不是插值和 element
-    node = parseText(context)
-  }
-
-  nodes.push(node)
-
   return nodes
 }
 
+function isEnd(context: ContextType, ancestors: any[]) {
+  // 遇到结束标签
+  const s = context.source
+  if (ancestors && s.startsWith('</')) {
+    for (let i = ancestors.length - 1; i >= 0; i--) {
+      const tag = ancestors[i].tag
+      if (startsWithEndTagOpen(s, tag)) {
+        return true
+      }
+    }
+  }
+
+  // source 没有值
+  return !s
+}
+
 function parseText(context: ContextType) {
-  const content = parseTextData(context, context.source.length)
+  let endTokens = ['<', '{{']
+  let endIndex = context.source.length
+
+  for (let i = 0; i < endTokens.length; i++) {
+    const index = context.source.indexOf(endTokens[i])
+    if (index !== -1 && endIndex > index) {
+      endIndex = index
+    }
+  }
+
+  const content = parseTextData(context, endIndex)
   return {
     type: NodeTypes.TEXT,
     content
@@ -61,12 +88,34 @@ function parseTextData(context: ContextType, length: number) {
   return content
 }
 
-function parseElement(context: ContextType) {
+function parseElement(context: ContextType, ancestors: any[]) {
   // 解析 tag
-  const element = parseTag(context, TagType.TAG_START)
-  parseTag(context, TagType.TAG_END)
+  const element: any = parseTag(context, TagType.TAG_START)
+  // 标签栈
+  ancestors.push(element)
+  element.children = parseChildren(context, ancestors)
+  ancestors.pop()
+
+  if (startsWithEndTagOpen(context.source, element.tag)) {
+    parseTag(context, TagType.TAG_END)
+  } else {
+    throw new Error(`缺少闭合标签:${element.tag}`)
+  }
 
   return element
+}
+
+function startsWithEndTagOpen(source: string, tag: string) {
+  // 1. 头部 是不是以  </ 开头的
+  // 2. 看看是不是和 tag 一样
+  return (
+    startsWith(source, '</') &&
+    source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase()
+  )
+}
+
+function startsWith(source: string, searchString: string): boolean {
+  return source.startsWith(searchString)
 }
 
 function parseTag(context: ContextType, type: TagType) {
