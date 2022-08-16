@@ -3,12 +3,17 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: parse
- * @LastEditTime: 2022-08-15 18:43:59
+ * @LastEditTime: 2022-08-15 22:09:05
  */
 
 import { NodeTypes } from './ast'
 
 type ContextType = { source: string }
+
+const enum TagType {
+  TAG_START,
+  TAG_END
+}
 
 export function baseParse(content: string) {
   const context = createParseContext(content)
@@ -20,13 +25,45 @@ function parseChildren(context: ContextType) {
   const nodes = []
 
   let node
-  if (context.source.startsWith('{{')) {
+  const s = context.source
+  if (s.startsWith('{{')) {
     node = parseInterpolation(context)
+  } else if (s[0] === '<') {
+    if (/[a-z]/i.test(s[1])) {
+      node = parseElement(context)
+    }
   }
 
   nodes.push(node)
 
   return nodes
+}
+
+function parseElement(context: ContextType) {
+  // 解析 tag
+  const element = parseTag(context, TagType.TAG_START)
+  parseTag(context, TagType.TAG_END)
+
+  return element
+}
+
+function parseTag(context: ContextType, type: TagType) {
+  // 匹配标签
+  // /<(\w+)[^>]*>(.*?<\/\1>)?/
+  const match = /^<(\/?[a-z]*)/i.exec(context.source)
+  const tag = match[1]
+
+  // 删除解析完的代码
+  advanceBy(context, match[0].length)
+  advanceBy(context, 1)
+
+  if (type === TagType.TAG_END) {
+    return
+  }
+  return {
+    type: NodeTypes.ELEMENT,
+    tag
+  }
 }
 
 function parseInterpolation(context: ContextType) {
