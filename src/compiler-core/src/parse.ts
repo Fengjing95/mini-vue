@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: parse
- * @LastEditTime: 2022-08-15 22:09:05
+ * @LastEditTime: 2022-08-16 15:28:38
  */
 
 import { NodeTypes } from './ast'
@@ -34,9 +34,31 @@ function parseChildren(context: ContextType) {
     }
   }
 
+  if (!node) {
+    // 如果不是插值和 element
+    node = parseText(context)
+  }
+
   nodes.push(node)
 
   return nodes
+}
+
+function parseText(context: ContextType) {
+  const content = parseTextData(context, context.source.length)
+  return {
+    type: NodeTypes.TEXT,
+    content
+  }
+}
+
+function parseTextData(context: ContextType, length: number) {
+  // 获取 content
+  const content = context.source.slice(0, length)
+
+  // 推进
+  advanceBy(context, content.length)
+  return content
 }
 
 function parseElement(context: ContextType) {
@@ -77,10 +99,11 @@ function parseInterpolation(context: ContextType) {
   advanceBy(context, openDelimiter.length) // 去除起始表示
 
   const rawContextLength = closeIndex - openDelimiter.length // 变量名长度
-  const rawContent = context.source.slice(0, rawContextLength) // 取出变量名
+  // const rawContent = context.source.slice(0, rawContextLength) // 取出变量名
+  const rawContent = parseTextData(context, rawContextLength)
   const content = rawContent.trim()
 
-  advanceBy(context, rawContextLength + closeDelimiter.length) // 去掉整个插值表达式
+  advanceBy(context, closeDelimiter.length) // 去掉整个插值表达式
 
   return {
     type: NodeTypes.INTERPOLATION,

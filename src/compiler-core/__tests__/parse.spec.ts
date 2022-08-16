@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: parse 单元测试
- * @LastEditTime: 2022-08-16 15:16:31
+ * @LastEditTime: 2022-08-16 15:20:42
  */
 import { NodeTypes } from '../src/ast'
 import { baseParse } from '../src/parse'
@@ -30,6 +30,17 @@ describe('parse', () => {
       expect(ast.children[0]).toStrictEqual({
         type: NodeTypes.ELEMENT,
         tag: 'div'
+      })
+    })
+  })
+
+  describe('text', () => {
+    it('simple text', () => {
+      const ast = baseParse('some text')
+
+      expect(ast.children[0]).toStrictEqual({
+        type: NodeTypes.TEXT,
+        content: 'some text'
       })
     })
   })
