@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: parse
- * @LastEditTime: 2022-08-16 17:11:41
+ * @LastEditTime: 2022-08-18 20:16:27
  */
 
 import { NodeTypes } from './ast'
@@ -169,7 +169,7 @@ function advanceBy(context: ContextType, length: number) {
 }
 
 function createRoot(children: any) {
-  return { children }
+  return { children, type: NodeTypes.ROOT }
 }
 
 function createParseContext(content: string): ContextType {

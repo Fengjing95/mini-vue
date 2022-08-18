@@ -1,15 +1,26 @@
+import { NodeTypes } from './ast'
+import { TO_DISPLAY_STRING } from './runtimeHelpers'
+
 /*
  * @Date: 2022-08-17 17:34:50
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 处理 ast 树
- * @LastEditTime: 2022-08-17 18:15:29
+ * @LastEditTime: 2022-08-18 20:29:10
  */
-export function transform(root: any, options: any) {
+export function transform(root: any, options: any = {}) {
   const context = createTransformContext(root, options)
+  // 修改
   // 遍历--深度优先
   traverseNode(root, context)
-  // 修改
+
+  createRootCodegen(root)
+
+  root.helpers = [...context.helpers.keys()]
+}
+
+function createRootCodegen(root: any) {
+  root.codegenNode = root.children[0]
 }
 
 function traverseNode(node: any, context: any) {
@@ -19,7 +30,18 @@ function traverseNode(node: any, context: any) {
     transform(node)
   }
 
-  traverseChildren(node, context)
+  switch (node.type) {
+    case NodeTypes.INTERPOLATION:
+      context.helper(TO_DISPLAY_STRING)
+      break
+    case NodeTypes.ROOT:
+    case NodeTypes.ELEMENT:
+      traverseChildren(node, context)
+      break
+
+    default:
+      break
+  }
 }
 
 function traverseChildren(node: any, context: any) {
@@ -37,7 +59,11 @@ function traverseChildren(node: any, context: any) {
 function createTransformContext(root: any, options: any) {
   const context = {
     root,
-    nodeTransforms: options.nodeTransforms || []
+    nodeTransforms: options.nodeTransforms || [],
+    helpers: new Map(),
+    helper(key: string) {
+      context.helpers.set(key, 1)
+    }
   }
 
   return context

@@ -3,11 +3,12 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-16 15:16:55
+ * @LastEditTime: 2022-08-18 20:16:51
  */
 export const enum NodeTypes {
   INTERPOLATION,
   SIMPLE_EXPRESSION,
   ELEMENT,
-  TEXT
+  TEXT,
+  ROOT
 }
