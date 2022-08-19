@@ -3,11 +3,16 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 代码生成
- * @LastEditTime: 2022-08-18 20:34:28
+ * @LastEditTime: 2022-08-19 21:29:44
  */
 
+import { isString } from '../../shared'
 import { NodeTypes } from './ast'
-import { helperMapName, TO_DISPLAY_STRING } from './runtimeHelpers'
+import {
+  CREATE_ELEMENT_VNODE,
+  helperMapName,
+  TO_DISPLAY_STRING
+} from './runtimeHelpers'
 
 export function generate(ast: any) {
   const context = createCodegenContext()
@@ -58,9 +63,64 @@ function genNode(context: any, node: any) {
       genExpression(context, node)
       break
 
+    case NodeTypes.ELEMENT:
+      genElement(context, node)
+      break
+
+    case NodeTypes.COMPOUND_EXPRESSION:
+      genCompoundExpression(context, node)
+      break
+
     default:
       break
   }
+}
+
+function genCompoundExpression(context: any, node: any) {
+  const children = node.children
+  const { push } = context
+
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i]
+    if (isString(child)) {
+      // 如果是文本类型直接 push ('+')
+      push(child)
+    } else {
+      genNode(context, child)
+    }
+  }
+}
+
+function genElement(context: any, node: any) {
+  const { push, helper } = context
+  const { tag, children, props } = node
+  // console.log('genElement', children)
+  // const child = children[0]
+
+  push(`${helper(CREATE_ELEMENT_VNODE)}(`)
+  // genNode(context, children)
+  genNodeList(context, genNullable([tag, props, children]))
+  push(')')
+}
+
+function genNodeList(context: any, nodes: any[]) {
+  const { push } = context
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    if (isString(node)) {
+      push(node)
+    } else {
+      genNode(context, node)
+    }
+
+    if (i < nodes.length - 1) {
+      push(', ')
+    }
+  }
+}
+
+function genNullable(args: any[]) {
+  return args.map(arg => arg || 'null')
 }
 
 function genExpression(context: any, node: any) {

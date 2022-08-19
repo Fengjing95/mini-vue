@@ -3,13 +3,16 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 工具方法
- * @LastEditTime: 2022-08-04 21:22:53
+ * @LastEditTime: 2022-08-19 17:47:46
  */
 // 继承属性
 export const extend = Object.assign
 
 // 是否为对象
 export const isObject = (val: any) => val !== null && typeof val === 'object'
+
+// 是否为字符串
+export const isString = (value: any) => typeof value === 'string'
 
 // 比较两个值是否发生变化
 export const hasChange = (newValue: any, value: any) =>
