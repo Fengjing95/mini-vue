@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 组件处理
- * @LastEditTime: 2022-08-14 21:51:05
+ * @LastEditTime: 2022-08-20 21:12:13
  */
 import { proxyRefs } from '../reactivity'
 import { shallowReadonly } from '../reactivity/reactive'
@@ -73,6 +73,12 @@ function handleSetupResult(instance: any, setupResult: any) {
 function finishComponentSetup(instance: any) {
   const Component = instance.type
 
+  if (compiler && !Component.render) {
+    if (Component.template) {
+      Component.render = compiler(Component.template)
+    }
+  }
+
   if (Component.render) {
     instance.render = Component.render
   }
@@ -85,4 +91,9 @@ export function getCurrentInstance() {
 
 function setCurrentInstance(instance: any) {
   currentInstance = instance
+}
+
+let compiler: Function
+export function registerRuntimeCompiler(_compiler: any) {
+  compiler = _compiler
 }

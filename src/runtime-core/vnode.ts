@@ -3,12 +3,14 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: description
- * @LastEditTime: 2022-08-14 21:47:32
+ * @LastEditTime: 2022-08-20 21:59:07
  */
 import { ShapeFlags } from '../shared/ShapeFlags'
 
 export const Fragment = Symbol('Fragment')
 export const Text = Symbol('Text')
+
+export { createVNode as createElementVNode }
 
 export function createVNode(type: any, props?: any, children?: any) {
   const vNode = {

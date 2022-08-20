@@ -3,8 +3,21 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: mini-vue 出口
- * @LastEditTime: 2022-08-09 17:45:41
+ * @LastEditTime: 2022-08-20 22:12:39
  */
 
 export * from './runtime-dom'
-export * from './reactivity'
+
+import { baseCompile } from './compiler-core/src'
+import * as runtimeDom from './runtime-dom'
+import { registerRuntimeCompiler } from './runtime-dom'
+
+function compileToFunction(template: string) {
+  const { code } = baseCompile(template)
+
+  const render = new Function('Vue', code)(runtimeDom)
+
+  return render
+}
+
+registerRuntimeCompiler(compileToFunction)

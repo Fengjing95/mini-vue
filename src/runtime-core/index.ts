@@ -3,12 +3,14 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 统一导出
- * @LastEditTime: 2022-08-15 14:09:59
+ * @LastEditTime: 2022-08-20 22:12:50
  */
 export { h } from './h'
 export { renderSlots } from './helpers/renderSlots'
-export { createTextNode } from './vnode'
-export { getCurrentInstance } from './component'
+export { createTextNode, createElementVNode } from './vnode'
+export { getCurrentInstance, registerRuntimeCompiler } from './component'
 export { provide, inject } from './apiInject'
 export { createRender } from './renderer'
 export { nextTick } from './scheduler'
+export { toDisplayString } from '../shared'
+export * from '../reactivity'

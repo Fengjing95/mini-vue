@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 渲染
- * @LastEditTime: 2022-08-15 14:19:33
+ * @LastEditTime: 2022-08-20 21:14:33
  */
 import { effect } from '../reactivity'
 import { ShapeFlags } from '../shared/ShapeFlags'
@@ -122,7 +122,10 @@ export function createRender(options: any): any {
         if (!instance.isMounted) {
           // 初始化
           const { proxy } = instance
-          const subTree = (instance.subTree = instance.render.call(proxy))
+          const subTree = (instance.subTree = instance.render.call(
+            proxy,
+            proxy
+          ))
 
           // vNode -> component -> render -> patch
           // vNode -> element -> mountElement
@@ -140,7 +143,7 @@ export function createRender(options: any): any {
           // 更新
           const { proxy } = instance
           // 取出当次的 subTree 和上一次的 subTree
-          const subTree = instance.render.call(proxy)
+          const subTree = instance.render.call(proxy, proxy)
           const prevSubTree = instance.subTree
           patch(prevSubTree, subTree, container, instance, anchor)
           // 更新subTree 用于下一次 update

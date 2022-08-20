@@ -3,8 +3,9 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 工具方法
- * @LastEditTime: 2022-08-19 17:47:46
+ * @LastEditTime: 2022-08-20 21:57:23
  */
+export * from './toDisplayString'
 // 继承属性
 export const extend = Object.assign
 
