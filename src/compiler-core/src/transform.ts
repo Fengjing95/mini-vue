@@ -1,13 +1,13 @@
-import { NodeTypes } from './ast'
-import { TO_DISPLAY_STRING } from './runtimeHelpers'
-
 /*
  * @Date: 2022-08-17 17:34:50
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 处理 ast 树
- * @LastEditTime: 2022-08-19 21:03:42
+ * @LastEditTime: 2022-08-20 08:59:38
  */
+import { NodeTypes } from './ast'
+import { TO_DISPLAY_STRING } from './runtimeHelpers'
+
 export function transform(root: any, options: any = {}) {
   const context = createTransformContext(root, options)
   // 修改
@@ -16,9 +16,11 @@ export function transform(root: any, options: any = {}) {
 
   createRootCodegen(root)
 
+  // 用于根据使用的 transform 插件生成对应的 import 语句
   root.helpers = [...context.helpers.keys()]
 }
 
+// 在根节点上创建 codegenNode
 function createRootCodegen(root: any) {
   let child = root.children[0]
   if (child.type === NodeTypes.ELEMENT && child.codegenNode) {
@@ -29,9 +31,10 @@ function createRootCodegen(root: any) {
   // root.codegenNode = root.children[0]
 }
 
+// traverse 节点
 function traverseNode(node: any, context: any) {
   const nodeTransforms = context.nodeTransforms
-  const exitFns = []
+  const exitFns = [] // 退出函数, 用于控制 transform 插件的执行顺序
 
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i]
@@ -54,12 +57,14 @@ function traverseNode(node: any, context: any) {
       break
   }
 
+  // 倒序执行
   let i = exitFns.length
   while (i--) {
     exitFns[i]()
   }
 }
 
+// traverse 子节点
 function traverseChildren(node: any, context: any) {
   const children = node.children
 
@@ -72,6 +77,7 @@ function traverseChildren(node: any, context: any) {
   }
 }
 
+// 创建 transform 上下文
 function createTransformContext(root: any, options: any) {
   const context = {
     root,

@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 代码生成
- * @LastEditTime: 2022-08-19 21:29:44
+ * @LastEditTime: 2022-08-20 08:55:59
  */
 
 import { isString } from '../../shared'
@@ -40,6 +40,7 @@ function genFunctionPreamble(ast: any, context: any) {
   const aliasHelpers = (s: symbol) =>
     `${helperMapName[s]} as _${helperMapName[s]}`
 
+  // 生成 import 语句
   context.push(
     ast.helpers.length > 0
       ? `import { ${ast.helpers
@@ -49,6 +50,7 @@ function genFunctionPreamble(ast: any, context: any) {
   )
 }
 
+// 根绝节点类型进行对应的代码生成
 function genNode(context: any, node: any) {
   switch (node.type) {
     case NodeTypes.TEXT:
@@ -76,6 +78,7 @@ function genNode(context: any, node: any) {
   }
 }
 
+// 生成混合表达式代码: hi, {{message}}
 function genCompoundExpression(context: any, node: any) {
   const children = node.children
   const { push } = context
@@ -91,6 +94,7 @@ function genCompoundExpression(context: any, node: any) {
   }
 }
 
+// 生成 DOM 元素代码
 function genElement(context: any, node: any) {
   const { push, helper } = context
   const { tag, children, props } = node
@@ -108,26 +112,32 @@ function genNodeList(context: any, nodes: any[]) {
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
     if (isString(node)) {
+      // 如果是文本类型,直接添加
       push(node)
     } else {
+      // 否则 genNode
       genNode(context, node)
     }
 
     if (i < nodes.length - 1) {
+      // 最后一个除外, 其余每个部分后面需要加逗号
       push(', ')
     }
   }
 }
 
+// 空值处理, 如果没有值返回字符串的 null
 function genNullable(args: any[]) {
   return args.map(arg => arg || 'null')
 }
 
+// 生成表达式代码字符串
 function genExpression(context: any, node: any) {
   const { push } = context
   push(`${node.content}`)
 }
 
+// 插值表达式代码
 function genInterpolation(context: any, node: any) {
   const { push, helper } = context
   push(`${helper(TO_DISPLAY_STRING)}(`)
@@ -135,17 +145,21 @@ function genInterpolation(context: any, node: any) {
   push(')')
 }
 
+// 生成文本代码
 function genText(context: any, node: any) {
   const { push } = context
   push(`'${node.content}'`)
 }
 
+// 创建 codegen 的上下文
 function createCodegenContext() {
   const context = {
     code: '',
+    // 追加 code
     push(source: string) {
       context.code += source
     },
+    // 调用对应的渲染函数前加下划线
     helper(key: symbol) {
       return `_${helperMapName[key]}`
     }
