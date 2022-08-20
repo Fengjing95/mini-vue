@@ -3,7 +3,7 @@
  * @Author: 枫
  * @LastEditors: 枫
  * @description: 代码生成
- * @LastEditTime: 2022-08-20 08:55:59
+ * @LastEditTime: 2022-08-20 22:07:55
  */
 
 import { isString } from '../../shared'
@@ -20,7 +20,7 @@ export function generate(ast: any) {
 
   genFunctionPreamble(ast, context)
 
-  push('export ')
+  push('return ')
 
   const functionName = 'render'
   const args = ['_ctx', '_cache']
@@ -36,16 +36,16 @@ export function generate(ast: any) {
 }
 
 function genFunctionPreamble(ast: any, context: any) {
-  const VueBinging = 'vue'
+  const VueBinging = 'Vue'
   const aliasHelpers = (s: symbol) =>
-    `${helperMapName[s]} as _${helperMapName[s]}`
+    `${helperMapName[s]} : _${helperMapName[s]}`
 
   // 生成 import 语句
   context.push(
     ast.helpers.length > 0
-      ? `import { ${ast.helpers
-          .map(aliasHelpers)
-          .join(', ')} } from "${VueBinging}"\n`
+      ? `const { ${ast.helpers.map(aliasHelpers).join(', ')} } = ${VueBinging}
+          
+        `
       : ''
   )
 }
